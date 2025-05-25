@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ethers } from 'ethers';
+import contractService from '../services/contractService';
 
 const WalletContext = createContext();
 
@@ -25,14 +26,20 @@ export const WalletProvider = ({ children }) => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const accounts = await provider.send('eth_requestAccounts', []);
       const network = await provider.getNetwork();
+      const signer = await provider.getSigner();
 
       setAccount(accounts[0]);
       setChainId(network.chainId);
       setProvider(provider);
 
+      // Initialize contract service
+      await contractService.init(provider, signer);
+
       // Listen for account changes
-      window.ethereum.on('accountsChanged', (accounts) => {
+      window.ethereum.on('accountsChanged', async (accounts) => {
         setAccount(accounts[0]);
+        const signer = await provider.getSigner();
+        await contractService.init(provider, signer);
       });
 
       // Listen for chain changes
@@ -50,6 +57,7 @@ export const WalletProvider = ({ children }) => {
     setAccount(null);
     setChainId(null);
     setProvider(null);
+    contractService.removeAllListeners();
   };
 
   useEffect(() => {
@@ -61,9 +69,11 @@ export const WalletProvider = ({ children }) => {
           const accounts = await provider.listAccounts();
           if (accounts.length > 0) {
             const network = await provider.getNetwork();
+            const signer = await provider.getSigner();
             setAccount(accounts[0]);
             setChainId(network.chainId);
             setProvider(provider);
+            await contractService.init(provider, signer);
           }
         } catch (err) {
           console.error('Error checking wallet connection:', err);

@@ -26,9 +26,9 @@ class ContractService {
     return await tx.wait();
   }
 
-  async transferProduct(productId, toAddress, role) {
+  async transferProduct(productId, to, role) {
     if (!this.contract) throw new Error('Contract not initialized');
-    const tx = await this.contract.transferProduct(productId, toAddress, role);
+    const tx = await this.contract.transferProduct(productId, to, role);
     return await tx.wait();
   }
 
@@ -42,15 +42,21 @@ class ContractService {
     return await this.contract.getAllProducts();
   }
 
+  async deleteProduct(productId) {
+    if (!this.contract) throw new Error('Contract not initialized');
+    const tx = await this.contract.deleteProduct(productId);
+    return await tx.wait();
+  }
+
   // Event listeners for real-time updates
   onProductAdded(callback) {
     if (!this.contract) throw new Error('Contract not initialized');
-    this.contract.on('ProductAdded', (productId, name, description, manufacturer, event) => {
+    this.contract.on('ProductAdded', (productId, manufacturer, name, description, event) => {
       callback({
         productId: productId.toString(),
+        manufacturer,
         name,
         description,
-        manufacturer,
         event
       });
     });
@@ -63,7 +69,18 @@ class ContractService {
         productId: productId.toString(),
         from,
         to,
-        role,
+        role: role.toString(),
+        event
+      });
+    });
+  }
+
+  onProductDeleted(callback) {
+    if (!this.contract) throw new Error('Contract not initialized');
+    this.contract.on('ProductDeleted', (productId, deletedBy, event) => {
+      callback({
+        productId: productId.toString(),
+        deletedBy,
         event
       });
     });
@@ -71,7 +88,7 @@ class ContractService {
 
   // Cleanup event listeners
   removeAllListeners() {
-    if (!this.contract) return;
+    if (!this.contract) throw new Error('Contract not initialized');
     this.contract.removeAllListeners();
   }
 }

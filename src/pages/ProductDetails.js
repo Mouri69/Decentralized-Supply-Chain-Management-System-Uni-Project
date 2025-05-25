@@ -12,29 +12,53 @@ import {
   List,
   ListItem,
   ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Alert,
 } from '@mui/material';
 import axios from 'axios';
+import { useWallet } from '../context/WalletContext';
+import contractService from '../services/contractService';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { account } = useWallet();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
-    const fetchProductDetails = async () => {
+    const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/products/${id}`);
-        setProduct(response.data);
-        setLoading(false);
+        const product = await contractService.getProduct(id);
+        setProduct(product);
       } catch (error) {
-        console.error('Error fetching product details:', error);
-        setLoading(false);
+        console.error('Error fetching product:', error);
+        setError('Failed to fetch product details');
       }
     };
 
-    fetchProductDetails();
+    fetchProduct();
   }, [id]);
+
+  const handleDelete = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await contractService.deleteProduct(id);
+      navigate('/products');
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      setError('Failed to delete product');
+    } finally {
+      setLoading(false);
+      setDeleteDialogOpen(false);
+    }
+  };
 
   const getStatusColor = (status) => {
     const colors = {
@@ -68,6 +92,12 @@ const ProductDetails = () => {
           Product Details
         </Typography>
       </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
       <Grid container spacing={3}>
         <Grid xs={12} md={6}>
@@ -134,6 +164,16 @@ const ProductDetails = () => {
         >
           Transfer Product
         </Button>
+        {account === product.currentOwner && (
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => setDeleteDialogOpen(true)}
+            disabled={loading}
+          >
+            Delete Product
+          </Button>
+        )}
         <Button
           variant="outlined"
           onClick={() => navigate('/products')}
@@ -141,6 +181,29 @@ const ProductDetails = () => {
           Back to Products
         </Button>
       </Box>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Delete Product</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this product? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleDelete}
+            color="error"
+            variant="contained"
+            disabled={loading}
+          >
+            {loading ? 'Deleting...' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
