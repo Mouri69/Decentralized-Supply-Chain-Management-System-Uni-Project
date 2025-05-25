@@ -9,6 +9,7 @@ import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
 import AddProduct from './pages/AddProduct';
 import TransferProduct from './pages/TransferProduct';
+import { WalletProvider } from './context/WalletContext';
 
 const theme = createTheme({
   palette: {
@@ -24,23 +25,25 @@ const theme = createTheme({
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          <Navbar />
-          <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/products/:id" element={<ProductDetails />} />
-              <Route path="/add-product" element={<AddProduct />} />
-              <Route path="/transfer-product/:id" element={<TransferProduct />} />
-            </Routes>
+    <WalletProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Router>
+          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Navbar />
+            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/products/:id" element={<ProductDetails />} />
+                <Route path="/add-product" element={<AddProduct />} />
+                <Route path="/transfer-product/:id" element={<TransferProduct />} />
+              </Routes>
+            </Box>
           </Box>
-        </Box>
-      </Router>
-    </ThemeProvider>
+        </Router>
+      </ThemeProvider>
+    </WalletProvider>
   );
 }
 

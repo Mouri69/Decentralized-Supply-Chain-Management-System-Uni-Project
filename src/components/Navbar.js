@@ -7,11 +7,19 @@ import {
   Button,
   Box,
   Chip,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import { useWallet } from '../context/WalletContext';
 
 const Navbar = () => {
-  // TODO: Get user role from context/state management
-  const userRole = 'Manufacturer'; // This will be dynamic later
+  const { account, connectWallet, disconnectWallet } = useWallet();
+
+  const formatAddress = (address) => {
+    if (!address) return '';
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   return (
     <AppBar position="static">
@@ -41,11 +49,25 @@ const Navbar = () => {
           >
             Add Product
           </Button>
-          <Chip
-            label={userRole}
-            color="secondary"
-            size="small"
-          />
+          {account ? (
+            <Tooltip title={account}>
+              <Chip
+                icon={<AccountBalanceWalletIcon />}
+                label={formatAddress(account)}
+                color="secondary"
+                onClick={disconnectWallet}
+                clickable
+              />
+            </Tooltip>
+          ) : (
+            <Button
+              color="inherit"
+              startIcon={<AccountBalanceWalletIcon />}
+              onClick={connectWallet}
+            >
+              Connect Wallet
+            </Button>
+          )}
         </Box>
       </Toolbar>
     </AppBar>

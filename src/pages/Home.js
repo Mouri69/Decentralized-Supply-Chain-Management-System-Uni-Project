@@ -40,7 +40,7 @@ const Home = () => {
 
       <Grid container spacing={4} sx={{ mt: 2 }}>
         {quickActions.map((action, index) => (
-          <Grid item xs={12} sm={6} key={index}>
+          <Grid key={index} xs={12} sm={6}>
             <Card>
               <CardContent>
                 <Typography variant="h5" component="h2" gutterBottom>

@@ -70,29 +70,29 @@ const ProductDetails = () => {
       </Box>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Basic Information
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <Typography variant="subtitle2">ID</Typography>
                 <Typography>{product.id}</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <Typography variant="subtitle2">Name</Typography>
                 <Typography>{product.name}</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <Typography variant="subtitle2">Description</Typography>
                 <Typography>{product.description}</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <Typography variant="subtitle2">Manufacturer</Typography>
                 <Typography>{product.manufacturer}</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <Typography variant="subtitle2">Status</Typography>
                 <Chip
                   label={product.status}
@@ -104,7 +104,7 @@ const ProductDetails = () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Product History
